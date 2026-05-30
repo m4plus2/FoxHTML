@@ -2,5 +2,5 @@
 A browser benchmark.
 
 # Minimum requirements
-1. Firefox 4 (2011), Safari 4 (2009), Chrome 4 (2010), IE 9 (2011), AOSP Browser 4.0 (2011) or later.
-2. 512 MB RAM and a single-core CPU or better.
+Firefox 45 (2016), Chrome 45 (2015), Safari 10 (2016), Edge 12 (2015), Opera 32 (2015), AOSP Browser 5.0 (2014) or later.
+512 MB RAM and a single-core CPU or better.

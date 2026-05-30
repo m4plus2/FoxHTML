@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoxHTML v1.0</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0f111a; color: #e4e7eb; }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #ff5722; margin-bottom: 5px; font-size: 2.5rem; }
+        .subtitle { color: #8a9fc2; font-size: 0.95rem; margin-top: 0; }
+        .card { background: #161b22; padding: 20px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 20px; }
+        button { background: #ff5722; color: white; border: none; padding: 15px 30px; font-weight: bold; border-radius: 6px; cursor: pointer; width: 100%; font-size: 18px; transition: background 0.2s; }
+        button:hover { background: #e64a19; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { background: #21262d; padding: 14px; margin: 10px 0; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #30363d; }
+        .test-name { font-weight: 500; }
+        .score { font-family: monospace; color: #ff9800; font-weight: bold; font-size: 1.1rem; }
+        canvas { display: block; margin: 20px auto; background: #000; border-radius: 8px; border: 1px solid #30363d; }
+        .loading { text-align: center; color: #ff9800; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>FoxHTML</h1>
+        <p class="subtitle">Open-Source Browser Engine Benchmark</p>
+    </div>
+
+    <div class="card">
+        <button onclick="runFoxHTMLSuite()">Go!</button>
+    </div>
+
+    <canvas id="foxCanvas" width="400" height="200"></canvas>
+
+    <div class="card" id="resultsCard" style="display: none;">
+        <h3>Engine Performance Metrics (Lower is Better)</h3>
+        <ul id="resultsList"></ul>
+    </div>
+
+    <div id="domSandbox" style="display:none;"></div>
+
+    <script>
+        function runFoxHTMLSuite() {
+            const resultsList = document.getElementById('resultsList');
+            const resultsCard = document.getElementById('resultsCard');
+            const sandbox = document.getElementById('domSandbox');
+            
+            sandbox.innerHTML = "";
+            resultsList.innerHTML = "<li class='loading'>Analyzing browser capabilities...</li>";
+            resultsCard.style.display = "block";
+
+            // Small delay to allow browser UI thread to update text before heavy loops lock it up
+            setTimeout(() => {
+                resultsList.innerHTML = "";
+
+                const startMath = performance.now();
+                let mathTracker = 0;
+                for (let i = 0; i < 2000000; i++) {
+                    mathTracker += Math.sqrt(i) * Math.sin(i);
+                }
+                const endMath = performance.now();
+                appendMetric("CPU Mathematical Stress Test", (endMath - startMath));
+
+                const startSort = performance.now();
+                let randomData = Array.from({length: 25000}, () => Math.floor(Math.random() * 100000));
+                randomData.sort((a, b) => a - b);
+                const endSort = performance.now();
+                appendMetric("Data Array Optimization Speed", (endSort - startSort));
+
+                const startJSON = performance.now();
+                let schema = {};
+                for (let i = 0; i < 4000; i++) {
+                    schema["record_" + i] = { index: i, timestamp: Date.now(), data: Math.random() };
+                }
+                let rawJSON = JSON.stringify(schema);
+                let finalizedObj = JSON.parse(rawJSON);
+                const endJSON = performance.now();
+                appendMetric("JSON Payload Deconstruction", (endJSON - startJSON));
+
+                const canvas = document.getElementById('foxCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const startCanvas = performance.now();
+                for (let i = 0; i < 4000; i++) {
+                    ctx.fillStyle = `rgba(${(i * 5) % 255}, ${(i * 13) % 255}, 230, 0.7)`;
+                    ctx.fillRect((i * 11) % canvas.width, (i * 7) % canvas.height, 12, 12);
+                }
+                const endCanvas = performance.now();
+                appendMetric("HTML5 Canvas 2D Draw Pipeline", (endCanvas - startCanvas));
+
+                const startDOM = performance.now();
+                const nodeFragment = document.createDocumentFragment();
+                for (let i = 0; i < 1500; i++) {
+                    const block = document.createElement('span');
+                    block.style.color = "red";
+                    nodeFragment.appendChild(block);
+                }
+                sandbox.appendChild(nodeFragment);
+                const endDOM = performance.now();
+                appendMetric("DOM Layout Tree Injections", (endDOM - startDOM));
+
+            }, 75);
+        }
+
+        function appendMetric(title, duration) {
+            const list = document.getElementById('resultsList');
+            list.innerHTML += `
+                <li>
+                    <span class="test-name">${title}</span>
+                    <span class="score">${duration.toFixed(1)} ms</span>
+                </li>`;
+        }
+    </script>
+</body>
+</html>
